@@ -1,6 +1,6 @@
-import { taskStatus } from "../tasks-status";
+import { TaskStatus } from "../tasks-status";
 
 export class GetTasksFilterDto{
-  status?: taskStatus;
+  status?: TaskStatus;
   search?: string;
 }

@@ -1,17 +1,38 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { taskStatus } from "./tasks-status";
+import { TaskStatus } from "./tasks-status";
 import { v4 as uuid } from "uuid";
 import { GetTasksFilterDto } from "./dto/get-tasks-filter.dto";
 import { TasksRepository } from "./tasks.repository";
 import { InjectRepository } from "@nestjs/typeorm";
+import { Task } from "./task.entity";
+import { CreateTaskDto } from "./dto/create-task.dto";
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectRepository(TasksRepository)
     private tasksRepository: TasksRepository
-  ) {
+  ) {}
+
+  async getTaskById(id: string): Promise<Task>{
+    const found = await this.tasksRepository.findOne(id);
+
+    if(!found){
+      throw new NotFoundException(`Task with ID "${id}" not found`)
+    }
+
+    return found
   }
+
+  createTask(createTaskDto: CreateTaskDto): Promise<Task> {
+    return  this.tasksRepository.createTask(createTaskDto);
+  }
+
+  async deleteTask(id): Promise<void> {
+    await this.tasksRepository.delete(id)
+  }
+
+
 
   // getAllTasks(): Task[] {
   //   return this.tasks;
@@ -33,38 +54,10 @@ export class TasksService {
   //   return tasks;
   // }
   //
-  // getOneTask(id): Task {
-  //   const found = this.tasks.find(item => item.id === id);
-  //   if (!found){
-  //     throw new NotFoundException(`Item with ID of ${id} was not found`);
-  //   }
-  //   return found;
-  // }
-  //
-  // createTask(createTaskDto): Task {
-  //   const { title, description } = createTaskDto;
-  //   const task: Task = {
-  //     id: uuid(),
-  //     title,
-  //     description,
-  //     status: taskStatus.OPEN
-  //   };
-  //
-  //   this.tasks.push(task);
-  //   return task;
-  // }
-  //
+
   // updateTaskStatus(id: string, status: taskStatus): void {
   //   const task = this.tasks.find(item => item.id === id);
   //   task.status = status;
-  // }
-  //
-  // deleteTask(id): void {
-  //   const index = this.tasks.findIndex(item => item.id === id);
-  //   if (!index){
-  //     throw new NotFoundException(`Item with ID of ${id} was not found`)
-  //   }
-  //   this.tasks.splice(index, 1);
   // }
 }
 
